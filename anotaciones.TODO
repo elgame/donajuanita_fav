@@ -1,0 +1,131 @@
+
+2013-06-19
+  Exporte la base de datos por si la quieres cargar, el archivo "db.sql"
+  ✔ gama Meter la configuracion del sistema en base de datos y crear formulario para modificarla (donde esta la opcion de cerrar sesion) y se cargue al cargas las paginas @done (13-06-19 15:45)
+  ✔ gama En el formulario de configuracion pedir el tamaño de fuente para el texto de los botones del punto de venta @done (13-06-19 15:45)
+  ✔ furby En el punto de venta q ponga el tamaño del texto de acuerdo a la configuracion, otra cosa creo q ya esta pero checarlo, si se hace mas chica la pantalla el texto de los botones no salta de renglon y sale un scroll, creo q les falta recargar los css. @done (13-06-20 13:15) [30 min]
+  ✔ gama Agregar un nuevo reporte "Ventas por producto" como esta la imagen q paso kary @done (13-06-20 16:14)
+  ✔ gama El reporte de "ventas" cuando se ponga desglosado que no ponga el margen en los productos de la venta, que cambie el color der header mejor @done (13-06-19 19:43)
+  ✔ furby Poner un min-width en la columna izquierda del punto de venta para q no se pierda la columna descuento @done (13-06-20 13:15) [15 min]
+  ✔ furby Ver la forma de mover el scroll de las columnas al dar click sin soltar y arrastrar el mouse por las touch @done (13-06-20 13:15) [8 hrs]
+  ✔ furby Poder agregar productos base (configurar las familias) al momento de hacer la venta (esto al final y me dices para ver como) @done (13-06-22 14:42) [8hrs]
+
+  ✔ SQL para poner en el servidor de kary @done (13-06-23 20:21)
+      -Agregar carpeta images/logos/
+      CREATE TABLE IF NOT EXISTS `config` (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `nombre` varchar(150) NOT NULL,
+        `razon_social` varchar(150) NOT NULL,
+        `rfc` varchar(15) NOT NULL,
+        `calle` varchar(100) NOT NULL,
+        `num_ext` varchar(12) NOT NULL,
+        `num_int` varchar(12) NOT NULL,
+        `colonia` varchar(100) NOT NULL,
+        `municipio` varchar(100) NOT NULL,
+        `estado` varchar(100) NOT NULL,
+        `cp` varchar(20) NOT NULL,
+        `telefono` varchar(50) NOT NULL,
+        `url_logo` varchar(100) NOT NULL,
+        `url_logop` varchar(10) NOT NULL,
+        `email` varchar(80) NOT NULL,
+        `pag_web` varchar(130) NOT NULL,
+        `footer` text NOT NULL,
+        `color_1` varchar(15) NOT NULL,
+        `color_2` varchar(15) NOT NULL,
+        `fuente_pv` varchar(3) NOT NULL,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+      INSERT INTO `config` (`id`, `nombre`, `razon_social`, `rfc`, `calle`, `num_ext`, `num_int`, `colonia`, `municipio`, `estado`, `cp`, `telefono`, `url_logo`, `url_logop`, `email`, `pag_web`, `footer`, `color_1`, `color_2`, `fuente_pv`) VALUES
+      (1, 'Cafe Digital', 'Centro de Impresión Digital Corte Laser y Cafetería', 'JAGF830204JM6', 'Av. Conchita', '#3768', 'A', 'Loma Bonita', 'Zapopan', 'Jalisco', '28500', '', 'application/images/logo.png', 'true', 'servicios@cafedigital.mx', 'www.cafedigital.mx', 'dasd', 'c79dc7', 'e0e0e0', '21');
+
+      UPDATE  `privilegios` SET  `nombre` =  'Reporte de ventas', `url_accion` =  'reportes/ventas/' WHERE  `privilegios`.`id` = 29;
+      INSERT INTO `privilegios` (`nombre`, `id_padre`, `mostrar_menu`, `url_accion`, `url_icono`, `target_blank`) VALUES ('Ventas de productos', 21, 1, 'reportes/ventas_productos/', 'print', 1);
+
+      CREATE VIEW `rpt_ventas_productos` AS select `pf`.`id` AS `id`,`t`.`fecha` AS `fecha`,`pf`.`codigo_barra` AS `codigo_barra`,`pf`.`nombre` AS `nombre`,`td`.`cantidad` AS `cantidad`,`td`.`importe` AS `importe` from ((`tickets` `t` join `tickets_detalle` `td` on((`td`.`ticket_id` = `t`.`id`))) join `productos_familias` `pf` on((`td`.`familia_id` = `pf`.`id`))) where (`t`.`status` = 1);
+
+
+
+* Reset tablas
+  DELETE FROM `productos_familias` WHERE `id` <> 1;
+  DELETE FROM `productos_base` WHERE 1;
+  DELETE FROM `clientes` WHERE 1;
+  DELETE FROM `proveedores` WHERE 1;
+  DELETE FROM `tickets` WHERE 1;
+  ALTER TABLE productos_familias AUTO_INCREMENT = 2;
+  ALTER TABLE productos_base AUTO_INCREMENT = 1;
+  ALTER TABLE clientes AUTO_INCREMENT = 1;
+  ALTER TABLE proveedores AUTO_INCREMENT = 1;
+  ALTER TABLE tickets AUTO_INCREMENT = 1;
+
+
+
+
+
+
+ALTER TABLE  `tickets` ADD  `subtotal_no_iva` DOUBLE NOT NULL COMMENT  'subtotal sin iva' AFTER  `fecha` ,
+ADD  `iva` DOUBLE NOT NULL AFTER  `subtotal_no_iva`;
+
+UPDATE `tickets` AS t SET `subtotal_no_iva`=(subtotal/1.16),
+`iva`=((subtotal/1.16) * 0.16) WHERE 1;
+
+
+ALTER TABLE  `productos_base` CHANGE  `descripcion`  `descripcion` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+
+
+
+
+
+
+Olders 2013-06-07 **************************************************
+
+ ✔ clientes quitar campos obligatorios @done (13-05-19 14:33)
+ ✔ familias las familias que esten contrahidas en conjunto de familias @done (13-05-19 14:49)
+ ✔ familias que marque para poner color plano o degradado @done (13-05-19 15:17)
+ ✔ punto de venta, el texto largo se sale del cuadro y sale un scroll, columnas mas chicas que salgan 5. @done (13-05-20 19:00)
+ ✔ reporte de ventas, poner precio de venta y compra, con la utilidad. @done (13-06-19 16:16)
+ ✔ productos base, agregar una descripcion y que lo agregue en el buscador @done (13-05-19 15:42)
+ ✔ en el ticket agregar al final una legenda @done (13-05-19 15:48)
+ ✔ desceunto individula por producto, en tickets en de talle poner el descuento y tambien al imprimir el ticket @done (13-05-20 22:43)
+
+campo en productos base:
+ALTER TABLE  `productos_base` ADD  `descripcion` VARCHAR( 255 ) NULL DEFAULT NULL AFTER  `marca`;
+
+UPDATE `productos_base_salidas` AS t SET `precio_compra`=(SELECT precio_compra
+FROM  `productos_base_entradas`
+WHERE cantidad >=0
+AND base_id = t.base_id
+ORDER BY fecha DESC
+LIMIT 1),
+`importe`=((SELECT precio_compra
+FROM  `productos_base_entradas`
+WHERE cantidad >=0
+AND base_id = t.base_id
+ORDER BY fecha DESC
+LIMIT 1) * t.cantidad) WHERE 1
+
+
+
+CREATE OR REPLACE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `productos_base_existencias` AS select `pb`.`id` AS `id`,ifnull(sum(`e`.`entradas`),0) AS `entradas`,ifnull(sum(`s`.`salidas`),0) AS `salidas`,(ifnull(sum(`e`.`entradas`),0) - ifnull(sum(`s`.`salidas`),0)) AS `existencia`,ifnull((select `productos_base_entradas`.`precio_compra` from `productos_base_entradas` where ((`productos_base_entradas`.`base_id` = `pb`.`id`) and (`productos_base_entradas`.`cantidad` >= 0)) order by `productos_base_entradas`.`fecha` desc limit 1),0) AS `precio_compra` from ((`productos_base` `pb` left join `productos_base_entradas_exist` `e` on((`e`.`base_id` = `pb`.`id`))) left join `productos_base_salidas_exist` `s` on((`s`.`base_id` = `pb`.`id`))) group by `pb`.`id`;
+
+
+CREATE or replace ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `productos_base_salidas_exist` AS
+SELECT pbs.base_id, SUM( pbs.cantidad ) AS salidas
+            FROM tickets AS t
+              INNER JOIN productos_base_salidas AS pbs ON pbs.ticket_id = t.id
+            WHERE t.status =1
+            GROUP BY pbs.base_id;
+
+SQL PARA AGREGAR LOS NUEVOS CAMPOS A LA TABLA TICKETS:
+  ALTER TABLE  `tickets` ADD  `subtotal` DOUBLE NOT NULL DEFAULT 0 AFTER  `fecha` ,
+  ADD  `recibido` DOUBLE NOT NULL DEFAULT 0 AFTER  `subtotal` ,
+  ADD  `cambio` DOUBLE NOT NULL DEFAULT 0 AFTER  `recibido` ,
+  ADD  `descuento` DOUBLE NOT NULL DEFAULT 0 AFTER  `cambio`;
+  ALTER TABLE  `tickets` ADD  `tipo_pago` VARCHAR( 20 ) NOT NULL DEFAULT 'efectivo' AFTER  `total`;
+
+CAMPO DESCUENTO TABLA TICKET DETALLE [20-05-2013]:
+  ✔ ALTER TABLE  `tickets_detalle` ADD  `descuento` DOUBLE NOT NULL DEFAULT  '0' COMMENT  '% descuento' @done (13-06-11 13:50)
+
+CAMPOS SUBTOTAL SIN IVA E IVA:
+  ✔ ALTER TABLE  `tickets` ADD  `subtotal_no_iva` DOUBLE NOT NULL COMMENT  'subtotal sin iva' AFTER  `fecha` , @done (13-06-11 13:50)
+ADD  `iva` DOUBLE NOT NULL AFTER  `subtotal_no_iva`
