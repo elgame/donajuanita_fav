@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= 'http://localhost/punto_venta/';
+$config['base_url']	= 'http://localhost/punto_venta_fav/';
 
 
 $config['vcarabiner']	= '1.2';
